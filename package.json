@@ -1,0 +1,23 @@
+{
+  "name": "boiler-plate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "react-router-dom": "^5.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sne12345/boiler-plate.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sne12345/boiler-plate/issues"
+  },
+  "homepage": "https://github.com/sne12345/boiler-plate#readme"
+}
