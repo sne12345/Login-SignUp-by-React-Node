@@ -1,10 +1,10 @@
 // 백엔드 시작점
 const express = require('express')
 const app = express()
-const port = 5000
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const { User } = require("./User")
+const { auth } = require('./middleware/auth')
+const { User } = require('./models/User')
 const config = require('./config/key')
 
 //application/x-www-form-urlencoded
@@ -22,11 +22,15 @@ mongoose.connect(config.mongoURI,{
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!~~~~~! 추석 잘 보내세요~~')
+  res.send('get / 요청입니다.')
 })
 
 
-app.post('/register',(req, res) => {
+app.get('/api/hello', (req, res) => {
+  res.send('get /api/hello 요청입니다.')
+})
+
+app.post('/api/users/register',(req, res) => {
 
   //회원가입할 때 필요한 정보들을 client에서 가져오면
   //그것들을 데이터베이스에 넣어준다.
@@ -40,7 +44,7 @@ app.post('/register',(req, res) => {
   })
 })
 
-app.post('/login',(req, res) => {
+app.post('/api/users/login',(req, res) => {
 
   // 요청된 이메일은 데이터베이스에서 있는지 찾는다.
   User.findOne({ email: req.body.email }, (err, user) => {
@@ -65,14 +69,42 @@ app.post('/login',(req, res) => {
         // 토큰을 저장한다. 어디에?  쿠키, 로컬스토리지
         res.cookie("x_auth", user.token)  
         .status(200)
-        .json({ loginSuccess: true, userId: user._id})
+        .json({ loginSuccess: true, userId: user._id ,message: "비밀번호가 맞았습니다."})
 
       })
     })
   })
 })
 
+app.get('/api/users/auth', auth, (req, res) => {
+
+  // 여기까지 미들웨어를 통과해 왔다는 얘기는 authentication이 true 라는 말
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.rold == 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image
+  })
+})
+
+app.get('/api/users/logout', auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id}, { token: "" }
+  , (err, user) => {
+    if(err) return res.json({ success: false, err});
+    return res.status(200).send({
+      success: true
+    })
+  })
+})
+
+const port = process.env.PORT || 5000
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
+module.exports = app;

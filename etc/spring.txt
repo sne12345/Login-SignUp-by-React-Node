@@ -1,0 +1,171 @@
+Quiz 1) @EnableAutoConfiguration이 빈을 등록하는 과정
+Quiz 2) @ComponentScan 이란?
+Quiz 3) 웹 서버 사용 하지 않는 방법, 포트 번호 변경하는 법, 랜덤 포트번호 사용하는 법
+
+
+#2 스프링부트 시작하기
+메인 자바 파일은 java 밑에 패키지 밑에 넣어주는 것이 좋음
+컴포넌트 스캔?
+
+#3 스프링부트 원리
+- 의존성
+: POM.xml 파일에서 왼쪽에 'o' 표시 뜨면 관리되고 있는 의존성임, 안 뜨면 버전을 꼭 써줘야 함
+: dependency에 버전이 없고, 두 개밖에 없음
+: parent -> dependencies : 버전들이 쭉 들어있고, 이 중에서 사용하면 따로 버전을 명시하지 않아도 됨
+: 우측 maven 창에서 의존성 관계를 볼 수 있음
+: 우리가 관리해야할 의존성이 줄어듦(버전 관리를 할 필요없음)
+: 특별히 원하는 버전이 있으면 써주면 됨
+만약, parent를 사용하지 않는다면 레퍼런스에 방법에 따르면 됨
+but, parent가 그 밖의 다른 설정들도 해주기 때문에 parent POM 쓰는 것을 추천
+
+- 의존성 버전 변경하는 법
+: parent -> dependencies 에서 버전 복사해서
+: POM.xml의 properties 에 버전 변경해서 추가
+
+
+// 자동 설정 
+
+- @EnableAutoConfiguration, 자동 설정
+: @SpringBootApplication = @SpringBootConfiguration + @ComponentScan + @EnableAutoConfiguration
+: Unable to start ServletWebServerApplicationContext due to missing ServletWebServerFactory bean.
+-> @EnableAutoConfiguration 에서 자동으로 만들어주는 빈
+-> WebApplicationType.NONE으로 설정해주면 됨
+: @ComponentScan 에서 먼저 빈을 불러들이고, @EnableAutoConfiguration 에서 두번째로 추가적인 빈을 등록해줌
+
+- @ComponentScan
+: @Component @Configuration @Repository @Service @Controller @RestController라는 어노테이션을 가진 클래스들을 스캔해서 빈으로 등록하는 것
+: TypeExcludeFilter과 AutoConfigurationExcludeFilter는 제외하고 빈으로 등록함
+: me.whiteship 밑에 있는 아이들만 빈으로 등록해 줌
+
+- @EnableAutoConfiguration
+: spring.factories
+: org.springframework.boot.autoconfigure.EnableAutoConfiguration 키값에 해당하는 모든 클래스를 빈에 등록함 -> 조건에 맞으면
+
+
+- starter 
+Xxx-Spring-Boot-Autoconfigure 모듈: 자동 설정
+Xxx-Spring-Boot-Starter 모듈: 필요한 의존성 정의
+그냥 하나로 만들고 싶을 때는?
+Xxx-Spring-Boot-Starter
+
+- autoconfiguration
+1. 의존성 추가
+<dependencies>
+  <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+  </dependency>
+  <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure-processor</artifactId>
+      <optional>true</optional>
+  </dependency>
+</dependencies>
+
+<dependencyManagement>
+  <dependencies>
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-dependencies</artifactId>
+          <version>2.0.3.RELEASE</version>
+          <type>pom</type>
+          <scope>import</scope>
+      </dependency>
+  </dependencies>
+</dependencyManagement>
+
+2. @Configuration 파일 작성 -> HolomanConfiguration.class
+
+package me.whiteship;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class HolomanConfiguration {
+
+    @Bean
+    public Holoman holoman(){
+        Holoman holoman = new Holoman();
+        holoman.setHowLong(5);
+        holoman.setName("keesun");
+        return holoman;
+    }
+}
+
+
+3. src/main/resource/META-INF에 spring.factories 파일 만들기 -> ?? 안됨
+
+4. spring.factories 안에 자동 설정 파일 추가
+
+5. maven install 
+-> 오른쪽 maven - lifecycle - install
+
+
+- 톰캣 내장 웹서버
+스프링 부트는 서버가 아니다.
+톰캣 객체 생성
+포트 설정
+톰캣에 컨텍스트 추가
+서블릿 만들기
+톰캣에 서블릿 추가
+컨텍스트에 서블릿 맵핑
+톰캣 실행 및 대기
+
+: 이 모든 과정을 보다 상세히 또 유연하고 설정하고 실행해주는게 바로 스프링 부트의 자동 설정.
+ServletWebServerFactoryAutoConfiguration (서블릿 웹 서버 생성)
+TomcatServletWebServerFactoryCustomizer (서버 커스터마이징)
+DispatcherServletAutoConfiguration 서블릿 만들고 등록
+
+
+- 컨테이너와 포트
+다른 서블릿 컨테이너로 변경
+웹 서버 사용 하지 않기
+: application.properties에  spring.main.web-application-type=none
+포트
+: application.properties에  server.port=7070
+랜덤 포트
+: application.properties에  server.port=0
+ApplicationListner<ServletWebServerInitializedEvent>
+
+
+- http와 https
+[terminal]
+keytool -genkey -alias spring -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.12 -validity 4000
+[application.properties]
+server.ssl.key-store=keystore.12
+server.ssl.key-store-type=PKCS12
+server.ssl.key-password=123456
+server.ssl.key-alias=spring
+
+
+- 독립적으로 실행되는 jar 파일
+mvn package를 하면 실행 가능한 JAR 파일 “하나가" 생성 됨.
+spring-maven-plugin이 해주는 일 (패키징)
+과거 “uber” jar 를 사용
+모든 클래스 (의존성 및 애플리케이션)를 하나로 압축하는 방법
+뭐가 어디에서 온건지 알 수가 없음
+무슨 라이브러리를 쓰는건지..
+내용은 다르지만 이름이 같은 파일은 또 어떻게?
+스프링 부트의 전략
+내장 JAR : 기본적으로 자바에는 내장 JAR를 로딩하는 표준적인 방법이 없음.
+애플리케이션 클래스와 라이브러리 위치 구분
+org.springframework.boot.loader.jar.JarFile을 사용해서 내장 JAR를 읽는다.
+org.springframework.boot.loader.Launcher를 사용해서 실행한다.
+
+
+- 스프링 부트 원리 정리
+의존성 관리
+: 이것만 넣어도 이만큼이나 다 알아서 가져오네?
+자동 설정
+: @EnableAutoConfiguration이 뭘 해주는지 알겠어.
+내장 웹 서버
+: 아 스프링 부트가 서버가 아니라 내장 서버를 실행하는 거군.
+독립적으로 실행 가능한 JAR
+: spring-boot-maven 플러그인이 이런걸 해주는구나..
+
+
+* 궁금한거
+- 빈 표시가 왜 안 뜰까요
+- META-INFO 어떻게 만드는지
+- Resource안에 application.properties 가 왜 자동으로 안만들어지는지
