@@ -2,7 +2,7 @@
   "name": "boiler-plate",
   "version": "1.0.0",
   "description": "",
-  "main": "./server/index.js",
+  "main": "./client/app.js",
   "dependencies": {
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
