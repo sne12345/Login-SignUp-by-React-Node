@@ -2,7 +2,7 @@
   "name": "boiler-plate",
   "version": "1.0.0",
   "description": "",
-  "main": "./client/app.js",
+  "main": "index.js",
   "dependencies": {
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
@@ -23,7 +23,7 @@
     "start": "npm run dev --prefix ./server",
     "server": "nodemon ./server/index.js",
     "client": "npm run start --prefix ./client",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --exit"
   },
   "repository": {
     "type": "git",
