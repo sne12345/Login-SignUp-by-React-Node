@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "concurrently \"npm run backend\" \"npm run start --prefix ../client\"",
     "backend": "nodemon index.js",
     "test": "mocha --exit",
     "dev": "concurrently \"npm run backend\" \"npm run start --prefix ../client\""
