@@ -8,6 +8,9 @@
   },
   "devDependencies": {},
   "scripts": {
+    "start": "npm run dev --prefix ./server",
+    "server": "nodemon ./server/index.js",
+    "client": "npm run start --prefix ./client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
