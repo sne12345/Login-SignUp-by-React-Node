@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../index')
+const app = require('../server/index')
 
 describe('GET /', () => {
     it('정상적인 요청, 200', (done) => {
