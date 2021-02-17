@@ -1,7 +1,7 @@
 stages:
   - test
 
-testing:
+lets_test:
   stage: test
   script:
     - echo hi
