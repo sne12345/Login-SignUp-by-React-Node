@@ -1,14 +1,9 @@
-image: node:latest
-
 stages:
   - test
-
-cache:
-  paths:
-    - node_modules/
 
 testing:
   stage: test
   script:
-    - npm install
-    - npm test
+    - echo hi
+  tags:
+    - MYRUNNER
